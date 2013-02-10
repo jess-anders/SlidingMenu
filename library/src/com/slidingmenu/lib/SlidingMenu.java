@@ -332,6 +332,21 @@ public class SlidingMenu extends RelativeLayout {
 		}
 	}
 
+  public void updateAttachedActivity(Activity activity) {
+    ViewGroup contentParent = (ViewGroup)activity.findViewById(android.R.id.content);
+
+    View content = contentParent.getChildAt(0);
+    contentParent.removeView(content);
+    ViewGroup vg = (ViewGroup)mViewAbove.getContent().getParent();
+    vg.removeView(mViewAbove.getContent());
+    contentParent.addView(mViewAbove.getContent());
+
+    content = contentParent.getChildAt(0);
+    contentParent.removeView(content);
+    contentParent.addView(this);
+    mViewAbove.setContent(content);
+  }
+
 	/**
 	 * Set the above view content from a layout resource. The resource will be inflated, adding all top-level views
 	 * to the above view.
