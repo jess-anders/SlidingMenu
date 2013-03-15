@@ -146,6 +146,20 @@ public class SlidingMenu extends RelativeLayout {
 		public void onClosed();
 	}
 
+  public interface OnVisibilityChangedListener {
+
+    /**
+     * On drawer visibility changed.
+     */
+    public void onVisibilityChanged(VisibilityState state);
+  }
+
+  public enum VisibilityState {
+    DRAWER_FULLY_OPEN,
+    DRAWER_PARTIALLY_OPEN,
+    DRAWER_CLOSED;
+  }
+
 	/**
 	 * The Interface CanvasTransformer.
 	 */
@@ -448,6 +462,10 @@ public class SlidingMenu extends RelativeLayout {
 	public boolean isSlidingEnabled() {
 		return mViewAbove.isSlidingEnabled();
 	}
+
+  public void setVisibilityChangedListener(SlidingMenu.OnVisibilityChangedListener l) {
+    mViewAbove.setVisibilityChangedListener(l);
+  }
 
 	/**
 	 * Sets which side the SlidingMenu should appear on.
@@ -1007,21 +1025,29 @@ public class SlidingMenu extends RelativeLayout {
 	public void manageLayers(float percentOpen) {
 		if (Build.VERSION.SDK_INT < 11) return;
 
-//		boolean layer = percentOpen > 0.0f && percentOpen < 1.0f;
-//		final int layerType = layer ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE;
-//
-//		if (layerType != getContent().getLayerType()) {
-//			mHandler.post(new Runnable() {
-//				public void run() {
-//					Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
-//					getContent().setLayerType(layerType, null);
-//					getMenu().setLayerType(layerType, null);
-//					if (getSecondaryMenu() != null) {
-//						getSecondaryMenu().setLayerType(layerType, null);
-//					}
-//				}
-//			});
-//		}
+		boolean layer = percentOpen > 0.0f && percentOpen < 1.0f;
+		final int layerType = layer ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE;
+
+		if (layerType != getContent().getLayerType()) {
+			mHandler.post(new Runnable() {
+				public void run() {
+					Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
+					getContent().setLayerType(layerType, null);
+					getMenu().setLayerType(layerType, null);
+					if (getSecondaryMenu() != null) {
+						getSecondaryMenu().setLayerType(layerType, null);
+					}
+				}
+			});
+		}
 	}
+
+  public void setTouchDragMargin(int pixels) {
+    mViewBehind.setTempMarginThreshold(pixels);
+  }
+
+  public void resetMarginThreshold() {
+    mViewBehind.resetMarginThreshold();
+  }
 
 }

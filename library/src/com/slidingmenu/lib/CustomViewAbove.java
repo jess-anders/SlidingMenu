@@ -66,6 +66,8 @@ public class CustomViewAbove extends ViewGroup {
 	 */
 	private float mLastMotionX;
 	private float mLastMotionY;
+
+  private SlidingMenu.VisibilityState mLastVisibilityState;
 	/**
 	 * ID of the active pointer. This is used to retain consistency during
 	 * drags/flings if multiple pointers are used.
@@ -96,6 +98,8 @@ public class CustomViewAbove extends ViewGroup {
 	//	private OnOpenListener mOpenListener;
 	private OnClosedListener mClosedListener;
 	private OnOpenedListener mOpenedListener;
+
+  private SlidingMenu.OnVisibilityChangedListener mVisibilityChangedListener;
 
 	private List<View> mIgnoredViews = new ArrayList<View>();
 
@@ -266,6 +270,10 @@ public class CustomViewAbove extends ViewGroup {
 	public void setOnClosedListener(OnClosedListener l) {
 		mClosedListener = l;
 	}
+
+  public void setVisibilityChangedListener(SlidingMenu.OnVisibilityChangedListener l) {
+    mVisibilityChangedListener = l;
+  }
 
 	/**
 	 * Set a separate OnPageChangeListener for internal use by the support library.
@@ -816,8 +824,23 @@ public class CustomViewAbove extends ViewGroup {
 		super.scrollTo(x, y);
 		mScrollX = x;
 		if (mEnabled)
-			mViewBehind.scrollBehindTo(mContent, x, y);	
-		((SlidingMenu)getParent()).manageLayers(getPercentOpen());
+			mViewBehind.scrollBehindTo(mContent, x, y);
+    float percentOpen = getPercentOpen();
+		((SlidingMenu)getParent()).manageLayers(percentOpen);
+
+    SlidingMenu.VisibilityState state = null;
+    if (percentOpen == 1.0f) {
+      state = SlidingMenu.VisibilityState.DRAWER_FULLY_OPEN;
+    } else if (percentOpen == 0.0f) {
+      state = SlidingMenu.VisibilityState.DRAWER_CLOSED;
+    } else {
+      state = SlidingMenu.VisibilityState.DRAWER_PARTIALLY_OPEN;
+    }
+
+    if (state != mLastVisibilityState && mVisibilityChangedListener != null) {
+      mVisibilityChangedListener.onVisibilityChanged(state);
+    }
+    mLastVisibilityState = state;
 	}
 
 	private int determineTargetPage(float pageOffset, int velocity, int deltaX) {

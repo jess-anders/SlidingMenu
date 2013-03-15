@@ -30,6 +30,7 @@ public class CustomViewBehind extends ViewGroup {
 	private int mWidthOffset;
 	private CanvasTransformer mTransformer;
 	private boolean mChildrenEnabled;
+  private int mDefaultMarginThreshold;
 
 	public CustomViewBehind(Context context) {
 		this(context, null);
@@ -37,9 +38,19 @@ public class CustomViewBehind extends ViewGroup {
 
 	public CustomViewBehind(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		mMarginThreshold = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 
+
+		mDefaultMarginThreshold = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
 				MARGIN_THRESHOLD, getResources().getDisplayMetrics());
+    mMarginThreshold = mDefaultMarginThreshold;
 	}
+
+  public void setTempMarginThreshold(int margin) {
+    mMarginThreshold = margin;
+  }
+
+  public void resetMarginThreshold() {
+    mMarginThreshold = mDefaultMarginThreshold;
+  }
 
 	public void setCustomViewAbove(CustomViewAbove customViewAbove) {
 		mViewAbove = customViewAbove;
