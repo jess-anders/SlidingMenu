@@ -209,7 +209,8 @@ public class SlidingActivityHelper {
 	 * @return true, if successful
 	 */
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK && mSlidingMenu.isMenuShowing()) {
+		if (keyCode == KeyEvent.KEYCODE_BACK &&
+        (mSlidingMenu.isMenuShowing() || mSlidingMenu.isSecondaryMenuShowing())) {
 			showContent();
 			return true;
 		}
