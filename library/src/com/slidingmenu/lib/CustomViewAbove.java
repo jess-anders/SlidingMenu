@@ -34,7 +34,7 @@ import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 public class CustomViewAbove extends ViewGroup {
 
 	private static final String TAG = "CustomViewAbove";
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	private static final boolean USE_CACHE = false;
 
@@ -583,6 +583,7 @@ public class CustomViewAbove extends ViewGroup {
 	private boolean thisTouchAllowed(MotionEvent ev) {
 		int x = (int) (ev.getX() + mScrollX);
 		if (isMenuOpen()) {
+      Log.d(TAG, "thisTouchAllowed isMenuOpen=true return="+mViewBehind.menuOpenTouchAllowed(mContent, mCurItem, x));
 			return mViewBehind.menuOpenTouchAllowed(mContent, mCurItem, x);
 		} else {
 			switch (mTouchMode) {
@@ -591,6 +592,7 @@ public class CustomViewAbove extends ViewGroup {
 			case SlidingMenu.TOUCHMODE_NONE:
 				return false;
 			case SlidingMenu.TOUCHMODE_MARGIN:
+        Log.d(TAG, "thisTouchAllowed mode margin="+mViewBehind.marginTouchAllowed(mContent, x));
 				return mViewBehind.marginTouchAllowed(mContent, x);
 			}
 		}
@@ -620,12 +622,13 @@ public class CustomViewAbove extends ViewGroup {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-
-
-		if (!mEnabled)
+    if (!mEnabled) {
+      Log.d(TAG, "onInterceptTouchEvent return, not mEnabled");
 			return false;
+    }
 
 		final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
+    Log.d(TAG, "onInterceptTouchEvent"+action+" pointer="+MotionEventCompat.getPointerId(ev, MotionEventCompat.getActionIndex(ev)));
 
 		if (DEBUG)
 			if (action == MotionEvent.ACTION_DOWN)
@@ -633,7 +636,7 @@ public class CustomViewAbove extends ViewGroup {
 
 		if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP
 				|| (action != MotionEvent.ACTION_DOWN && mIsUnableToDrag)) {
-			endDrag();
+      endDrag();
 			return false;
 		}
 
@@ -655,9 +658,11 @@ public class CustomViewAbove extends ViewGroup {
           mIsUnableToDrag = false;
           if (isMenuOpen() && mViewBehind.menuTouchInQuickReturn(mContent, mCurItem, ev.getX() + mScrollX)) {
             mQuickReturn = true;
+            Log.d(TAG, "onInterceptTouchEvent mQuickReturn"+true+ " isMenuOpen="+isMenuOpen()+" other part of if="+mViewBehind.menuTouchInQuickReturn(mContent, mCurItem, ev.getX() + mScrollX));
           }
         } else {
           mIsUnableToDrag = true;
+          Log.d(TAG, "onInterceptTouchEvent mIsUnableToDrag"+mIsUnableToDrag);
         }
         break;
       case MotionEventCompat.ACTION_POINTER_UP:
@@ -675,6 +680,8 @@ public class CustomViewAbove extends ViewGroup {
       Log.e(TAG, "Exception while processing onInterceptTouchEvent ev="+ev, e);
     }
 
+    Log.d(TAG, "onInterceptTouchEvent returning from bottom mIsBeingDragged="+mIsBeingDragged+" mQuickReturn="+mQuickReturn);
+
 		return mIsBeingDragged || mQuickReturn;
 	}
 
@@ -682,11 +689,15 @@ public class CustomViewAbove extends ViewGroup {
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 
-		if (!mEnabled)
+		if (!mEnabled) {
+      Log.d(TAG, "onTouchEvent bail early !mEnabled");
 			return false;
+    }
 
-		if (!mIsBeingDragged && !thisTouchAllowed(ev))
+		if (!mIsBeingDragged && !thisTouchAllowed(ev)) {
+      Log.d(TAG, "onTouchEvent bail early mIsBeingDragged="+mIsBeingDragged+" !thisTouchAllowed()="+!thisTouchAllowed(ev));
 			return false;
+    }
 
 		//		if (!mIsBeingDragged && !mQuickReturn)
 		//			return false;
