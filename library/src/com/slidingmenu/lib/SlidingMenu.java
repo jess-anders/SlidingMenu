@@ -301,6 +301,10 @@ public class SlidingMenu extends RelativeLayout {
 		attachToActivity(activity, slideStyle, false);
 	}
 
+  public void attachToActivity(Activity activity, int slideStyle, boolean actionbarOverlay) {
+    attachToActivity(activity, slideStyle, actionbarOverlay);
+  }
+
 	/**
 	 * Attaches the SlidingMenu to an entire Activity
 	 * 
@@ -308,7 +312,7 @@ public class SlidingMenu extends RelativeLayout {
 	 * @param slideStyle either SLIDING_CONTENT or SLIDING_WINDOW
 	 * @param actionbarOverlay whether or not the ActionBar is overlaid
 	 */
-	public void attachToActivity(Activity activity, int slideStyle, boolean actionbarOverlay) {
+	public void attachToActivity(Activity activity, int slideStyle, boolean actionbarOverlay, int contentId) {
 		if (slideStyle != SLIDING_WINDOW && slideStyle != SLIDING_CONTENT)
 			throw new IllegalArgumentException("slideStyle must be either SLIDING_WINDOW or SLIDING_CONTENT");
 
@@ -336,13 +340,22 @@ public class SlidingMenu extends RelativeLayout {
 			// take the above view out of
 			ViewGroup contentParent = (ViewGroup)activity.findViewById(android.R.id.content);
 			View content = contentParent.getChildAt(0);
-			contentParent.removeView(content);
-			contentParent.addView(this);
-			setContent(content);
-			// save people from having transparent backgrounds
-			if (content.getBackground() == null)
-				content.setBackgroundResource(background);
-			break;
+			if (content == null) {
+        Log.d(TAG, "content is null, so trying to get it a different way");
+        content = activity.findViewById(contentId);
+        contentParent = (ViewGroup) content.getParent();
+        contentParent.removeView(content);
+        contentParent.addView(this);
+        setContent(content);
+      } else {
+        contentParent.removeView(content);
+        contentParent.addView(this);
+        setContent(content);
+      }
+      // save people from having transparent backgrounds
+      if (content.getBackground() == null)
+        content.setBackgroundResource(background);
+      break;
 		}
 	}
 
