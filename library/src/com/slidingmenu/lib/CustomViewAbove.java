@@ -639,6 +639,7 @@ public class CustomViewAbove extends ViewGroup {
         mActivePointerId = MotionEventCompat.getPointerId(ev, index);
         if (mActivePointerId == INVALID_POINTER)
           break;
+        mQuickReturn = false;
         mLastMotionX = mInitialMotionX = MotionEventCompat.getX(ev, index);
         mLastMotionY = MotionEventCompat.getY(ev, index);
         if (thisTouchAllowed(ev)) {
